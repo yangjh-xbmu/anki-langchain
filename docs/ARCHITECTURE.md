@@ -74,11 +74,13 @@ Database ──► Backend API ──► Frontend ──► User Interface
 ### 1. AnkiService - Anki集成服务
 
 **职责：**
+
 - 连接Anki Desktop（通过AnkiConnect）
 - 获取卡片数据和媒体文件
 - 处理Anki数据格式
 
 **核心方法：**
+
 ```python
 class AnkiService:
     def get_cards(self) -> List[Dict]           # 获取卡片列表
@@ -89,11 +91,13 @@ class AnkiService:
 ### 2. LangChainService - AI增强服务
 
 **职责：**
+
 - Google Gemini AI集成
 - 音频URL处理和生成
 - 内容增强和优化
 
 **核心方法：**
+
 ```python
 class LangChainService:
     def process_audio_url(self, word, audio_info=None)  # 音频处理入口
@@ -106,6 +110,7 @@ class LangChainService:
 ### 3. 音频处理架构
 
 **音频源优先级：**
+
 ```
 1. Anki有道API音频 (最高优先级)
    ├── 格式: http://dict.youdao.com/dictvoice?type=1&audio={word}
@@ -121,6 +126,7 @@ class LangChainService:
 ```
 
 **前端音频播放架构：**
+
 ```typescript
 // 自动播放机制
 useEffect(() => {
@@ -145,6 +151,7 @@ const playAudio = async (audioUrl: string) => {
 ```
 
 **播放方式：**
+
 - 自动播放：单词载入后1秒自动播放
 - 手动播放：Shift+P快捷键或点击播放按钮
 - 错误处理：播放失败时控制台输出错误信息
@@ -163,6 +170,7 @@ const playAudio = async (audioUrl: string) => {
 ### 数据格式
 
 **单词数据格式：**
+
 ```json
 {
   "id": 1,
@@ -233,12 +241,14 @@ interface AudioState {
 ## 🔒 安全考虑
 
 ### 数据安全
+
 - 环境变量管理（.env文件）
 - API密钥保护
 - 输入验证和清理
 - SQL注入防护（SQLAlchemy ORM）
 
 ### 网络安全
+
 - CORS配置
 - 请求频率限制
 - 错误信息脱敏
@@ -246,12 +256,14 @@ interface AudioState {
 ## 📈 性能优化
 
 ### 后端优化
+
 - 数据库查询优化
 - 音频文件缓存
 - API响应压缩
 - 连接池管理
 
 ### 前端优化
+
 - 组件懒加载
 - 音频预加载
 - 状态更新优化
@@ -260,6 +272,7 @@ interface AudioState {
 ## 🚀 部署架构
 
 ### 开发环境
+
 ```
 ├── Backend: http://localhost:5001
 ├── Frontend: http://localhost:3000
@@ -268,6 +281,7 @@ interface AudioState {
 ```
 
 ### 生产环境建议
+
 ```
 ├── Backend: Flask + Gunicorn
 ├── Frontend: Next.js静态导出
@@ -279,12 +293,14 @@ interface AudioState {
 ## 🔄 扩展性设计
 
 ### 水平扩展
+
 - 微服务架构拆分
 - 数据库读写分离
 - 缓存层引入（Redis）
 - 负载均衡
 
 ### 功能扩展
+
 - 多语言支持
 - 用户系统
 - 学习进度跟踪
@@ -293,12 +309,14 @@ interface AudioState {
 ## 📋 技术债务
 
 ### 已知问题
+
 - 调试面板需要优化为正式功能
 - 音频播放依赖外部API（有道）
 - 错误处理可以更完善
 - 缺少单元测试覆盖
 
 ### 改进计划
+
 - 引入测试框架
 - 完善错误处理
 - 优化性能监控

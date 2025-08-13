@@ -77,3 +77,54 @@ class PracticeSession(db.Model):
     
     def __repr__(self):
         return f'<PracticeSession {self.word.word}: {self.is_correct}>'
+
+
+class WordMemory(db.Model):
+    """单词记忆状态模型（支持FSRS算法）"""
+    id = db.Column(db.Integer, primary_key=True)
+    word_id = db.Column(db.Integer, db.ForeignKey('word.id'), nullable=False, unique=True)
+    
+    # FSRS核心参数
+    stability = db.Column(db.Float, default=0.0, nullable=False)  # 记忆稳定性
+    difficulty = db.Column(db.Float, default=0.0, nullable=False)  # 记忆难度
+    
+    # 复习状态
+    last_review = db.Column(db.DateTime, nullable=True)
+    next_review = db.Column(
+        db.DateTime, nullable=True, index=True
+    )
+    review_count = db.Column(db.Integer, default=0, nullable=False)
+    consecutive_correct = db.Column(db.Integer, default=0, nullable=False)
+    total_reviews = db.Column(db.Integer, default=0, nullable=False)
+    
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    
+    word = db.relationship('Word',
+                          backref=db.backref('memory', uselist=False))
+    
+    def to_dict(self):
+        """转换为字典格式"""
+        return {
+            'id': self.id,
+            'word_id': self.word_id,
+            'stability': self.stability,
+            'difficulty': self.difficulty,
+            'last_review': (self.last_review.isoformat()
+                           if self.last_review else None),
+            'next_review': (self.next_review.isoformat()
+                           if self.next_review else None),
+            'review_count': self.review_count,
+            'consecutive_correct': self.consecutive_correct,
+            'total_reviews': self.total_reviews,
+            'created_at': (self.created_at.isoformat()
+                           if self.created_at else None),
+            'updated_at': (self.updated_at.isoformat()
+                           if self.updated_at else None)
+        }
+    
+    def __repr__(self):
+        return (
+            f'<WordMemory {self.word.word} '
+            f'stability={self.stability:.2f} difficulty={self.difficulty:.2f}>'
+        )

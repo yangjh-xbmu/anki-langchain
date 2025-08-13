@@ -39,6 +39,7 @@ engine-strict=true
 ### 4. `.vscode/tasks.json` - VSCode 任务配置
 
 包含以下预定义任务：
+
 - `Install Frontend Dependencies`: 使用 `npm install`
 - `Start Frontend`: 使用 `npm run dev`
 
@@ -69,11 +70,13 @@ npm run dev &
 ## 📖 文档更新
 
 ### `README.md`
+
 - 前端安装说明使用 npm
 - 故障排除部分包含 npm 相关命令
 - 明确说明项目使用 npm
 
 ### `STARTUP_GUIDE.md`
+
 - 所有启动命令使用 npm
 - 可用脚本说明更新为 npm
 - 依赖安装指南使用 npm
@@ -88,6 +91,7 @@ npm run dev &
 ## 🛠️ 常用命令
 
 ### 安装依赖
+
 ```bash
 # 安装所有依赖
 npm install
@@ -100,12 +104,14 @@ npm run install
 ```
 
 ### 启动服务
+
 ```bash
 # 启动前端开发服务器
 npm run dev
 ```
 
 ### 添加依赖
+
 ```bash
 # 添加生产依赖
 cd frontend && npm install <package-name>

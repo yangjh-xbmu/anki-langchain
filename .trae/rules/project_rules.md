@@ -1,5 +1,48 @@
 # Development Guidelines
 
+## Context Loading Strategy
+
+### Essential Information for Every Conversation
+
+#### Automatically Available Context
+
+- **Project Structure**: Current working directory files and folder hierarchy
+- **Terminal Status**: Running commands, available terminals, background processes
+- **Recent Activity**: Recently viewed files, edit history, cursor position
+- **System Environment**: Operating system type, available tools, environment configuration
+
+#### Proactively Load Project Information
+
+1. **Project Documentation**:
+   - `README.md` - Project overview and usage instructions
+   - `DEVELOPMENT_RULES.md` - Development standards and processes
+   - `docs/LESSONS_LEARNED.md` - Experience and best practices
+   - `IMPLEMENTATION_PLAN.md` - Current implementation plan (if exists)
+
+2. **Technical Architecture**:
+   - Dependency management files (`package.json`, `requirements.txt`, etc.)
+   - Configuration files (`.env`, `config.js`, etc.)
+   - Core code structure and design patterns
+
+3. **Current State**:
+   - Running services and ports
+   - Recent code changes
+   - Pending issues or TODO items
+
+#### Task-Specific Information Loading
+
+- **Code Modification**: Complete context of related files, dependencies, test files
+- **Debugging Issues**: Error logs, related configurations, similar problem solutions
+- **New Feature Development**: Implementation patterns of existing similar features, project conventions
+- **Documentation Updates**: Existing documentation structure, writing style, content organization
+
+#### Information Loading Priority Principles
+
+1. **Safety First**: Ensure no breaking of existing functionality
+2. **Understand Current State**: Fully understand current implementation before modifications
+3. **Follow Conventions**: Maintain consistency with existing project patterns
+4. **Incremental Improvement**: Avoid major refactoring, prioritize small iterations
+
 ## Philosophy
 
 ### Core Beliefs
@@ -153,4 +196,19 @@ When multiple valid approaches exist, choose based on:
 - Update plan documentation as you go
 - Learn from existing implementations
 - Stop after 3 failed attempts and reassess
+- Load sufficient context before making changes
+- Verify understanding of existing patterns
+- Document context-gathering decisions
 - think in English, write in Chinese
+
+## Context Verification Checklist
+
+Before making any changes, ensure you have:
+
+- [ ] Reviewed relevant project documentation
+- [ ] Understood existing code patterns and conventions
+- [ ] Identified similar implementations in the codebase
+- [ ] Checked current system state and running processes
+- [ ] Verified dependencies and configuration requirements
+- [ ] Assessed impact on existing functionality
+- [ ] Planned incremental implementation approach

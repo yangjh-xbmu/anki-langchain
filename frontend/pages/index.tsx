@@ -1,6 +1,6 @@
+import { EyeSlashIcon, PhotoIcon, SpeakerWaveIcon } from '@heroicons/react/24/outline';
 import axios from "axios";
-import React, { useEffect, useState, useRef } from "react";
-import { SpeakerWaveIcon, PhotoIcon, EyeSlashIcon } from '@heroicons/react/24/outline';
+import React, { useEffect, useRef, useState } from "react";
 
 interface Word {
   id: string;
@@ -39,13 +39,14 @@ export default function Home() {
     total: 0,
     streak: 0
   });
+  const [userInteracted, setUserInteracted] = useState(false);
   
   // 输入框引用，用于自动聚焦
   const inputRef = useRef<HTMLInputElement>(null);
 
   const fetchWords = async () => {
     try {
-      const response = await axios.get("http://localhost:5001/api/words");
+      const response = await axios.get("/api/words");
       setWords(response.data);
       setWordCount(response.data.length);
       if (response.data.length > 0) {
@@ -59,7 +60,7 @@ export default function Home() {
   const syncAnkiWords = async () => {
     setSyncStatus("正在同步 Anki 单词...");
     try {
-      const response = await axios.post("http://localhost:5001/api/sync-anki");
+      const response = await axios.post("/api/sync-anki");
       setSyncStatus(`同步完成！获取了 ${response.data.count} 个单词`);
       await fetchWords();
       setTimeout(() => setSyncStatus(""), 3000);
@@ -72,9 +73,14 @@ export default function Home() {
   const submitAnswer = async () => {
     if (!currentWord || !userAnswer.trim()) return;
 
+    // 标记用户已交互
+    if (!userInteracted) {
+      setUserInteracted(true);
+    }
+
     setIsLoading(true);
     try {
-      const response = await axios.post("http://localhost:5001/api/check-answer", {
+      const response = await axios.post("/api/check-answer", {
         word_id: currentWord.id,
         user_answer: userAnswer.trim(),
         answer_type: "spelling"
@@ -113,6 +119,11 @@ export default function Home() {
 
   const nextWord = () => {
     if (words.length > 0) {
+      // 标记用户已交互
+      if (!userInteracted) {
+        setUserInteracted(true);
+      }
+      
       const nextIndex = Math.floor(Math.random() * words.length);
       setCurrentWord(words[nextIndex]);
       // 切换单词后聚焦到输入框
@@ -125,9 +136,23 @@ export default function Home() {
   const playAudio = async (audioUrl: string) => {
     try {
       const audio = new Audio(audioUrl);
-      await audio.play();
+      // 设置音频属性
+      audio.preload = 'auto';
+      audio.volume = 0.8;
+      
+      // 尝试播放音频
+      const playPromise = audio.play();
+      
+      if (playPromise !== undefined) {
+        await playPromise;
+        console.log("音频播放成功:", audioUrl);
+      }
     } catch (error) {
       console.error("播放音频失败:", error);
+      // 如果是自动播放被阻止，提示用户
+      if (error.name === 'NotAllowedError') {
+        console.warn("浏览器阻止了自动播放，请点击播放按钮手动播放音频");
+      }
     }
   };
 
@@ -174,6 +199,9 @@ export default function Home() {
       if (e.key === "Escape") {
         nextWord();
       } else if (e.key.toLowerCase() === "p" && e.shiftKey && currentWord?.audio_url) {
+        if (!userInteracted) {
+          setUserInteracted(true);
+        }
         playAudio(currentWord.audio_url);
       } else if (e.key.toLowerCase() === "i") {
         setShowImage(!showImage);
@@ -226,30 +254,6 @@ export default function Home() {
           </div>
         )}
 
-        {/* 控制按钮 */}
-        <div className="flex justify-center gap-3 mb-8">
-          <button
-            onClick={syncAnkiWords}
-            className="bg-white hover:bg-gray-50 text-gray-700 px-4 py-2 rounded-xl shadow-sm border border-gray-200 transition-all duration-200 flex items-center gap-2"
-          >
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
-            </svg>
-            <span className="text-sm font-medium">同步 Anki 单词</span>
-          </button>
-          <button
-            onClick={() => setShowImage(!showImage)}
-            className="bg-white hover:bg-gray-50 text-gray-700 px-4 py-2 rounded-xl shadow-sm border border-gray-200 transition-all duration-200 flex items-center gap-2"
-          >
-            {showImage ? (
-              <EyeSlashIcon className="h-4 w-4" />
-            ) : (
-              <PhotoIcon className="h-4 w-4" />
-            )}
-            <span className="text-sm font-medium">{showImage ? '隐藏图片' : '显示图片'}</span>
-          </button>
-        </div>
-
         {/* 状态信息 */}
         {syncStatus && (
           <div className="alert alert-info mb-6">
@@ -257,14 +261,6 @@ export default function Home() {
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
             </svg>
             <span>{syncStatus}</span>
-          </div>
-        )}
-
-        {wordCount > 0 && (
-          <div className="text-center mb-8">
-            <div className="badge badge-primary badge-lg">
-              词库共有 {wordCount} 个单词
-            </div>
           </div>
         )}
 
@@ -289,7 +285,12 @@ export default function Home() {
                     {/* 音频播放按钮 */}
                     {currentWord.audio_url && (
                       <button
-                        onClick={() => playAudio(currentWord.audio_url!)}
+                        onClick={() => {
+                          if (!userInteracted) {
+                            setUserInteracted(true);
+                          }
+                          playAudio(currentWord.audio_url!);
+                        }}
                         className="absolute -bottom-4 -right-4 w-12 h-12 bg-green-500 hover:bg-green-600 text-white rounded-full shadow-lg transition-all duration-200 flex items-center justify-center"
                         title="播放发音"
                       >
@@ -322,7 +323,7 @@ export default function Home() {
                     className="w-full px-6 py-4 text-2xl text-center border-2 border-gray-200 rounded-2xl focus:border-blue-500 focus:outline-none transition-all duration-200"
                     disabled={feedback !== "" || isLoading}
                     autoFocus
-                    inputMode="latin"
+                    inputMode="text"
                     autoComplete="off"
                     autoCorrect="off"
                     spellCheck="false"
@@ -412,6 +413,42 @@ export default function Home() {
               </div>
             </div>
           </div>
+        </div>
+
+        {/* 次要功能区域 - 移到页面底部 */}
+        <div className="mt-8 space-y-6">
+          {/* 控制按钮 */}
+          <div className="flex justify-center gap-3">
+            <button
+              onClick={syncAnkiWords}
+              className="bg-white hover:bg-gray-50 text-gray-700 px-4 py-2 rounded-xl shadow-sm border border-gray-200 transition-all duration-200 flex items-center gap-2"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+              </svg>
+              <span className="text-sm font-medium">同步 Anki 单词</span>
+            </button>
+            <button
+              onClick={() => setShowImage(!showImage)}
+              className="bg-white hover:bg-gray-50 text-gray-700 px-4 py-2 rounded-xl shadow-sm border border-gray-200 transition-all duration-200 flex items-center gap-2"
+            >
+              {showImage ? (
+                <EyeSlashIcon className="h-4 w-4" />
+              ) : (
+                <PhotoIcon className="h-4 w-4" />
+              )}
+              <span className="text-sm font-medium">{showImage ? '隐藏图片' : '显示图片'}</span>
+            </button>
+          </div>
+
+          {/* 词库统计信息 */}
+          {wordCount > 0 && (
+            <div className="text-center">
+              <div className="inline-block bg-gray-50 text-gray-600 px-4 py-2 rounded-xl text-sm">
+                词库共有 {wordCount} 个单词
+              </div>
+            </div>
+          )}
         </div>
       </div>
     </div>

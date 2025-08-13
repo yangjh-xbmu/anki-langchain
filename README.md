@@ -53,6 +53,7 @@ anki-langchain/
 ### 1. 环境准备
 
 确保已安装以下软件：
+
 - **Python 3.8+**: 后端 Flask 应用运行环境
 - **Node.js 16+**: 前端 Next.js 应用构建环境
 - **Anki 桌面版**: 需要安装 AnkiConnect 插件（代码：2055492159）
@@ -227,9 +228,10 @@ PYTHONPATH=./backend
 ## 🎯 功能特性
 
 ### 核心学习功能
+
 - 🃏 **Anki 深度集成**: 自动同步 Anki 卡片，提取单词、释义和图片
 - 🤖 **Gemini AI 定义**: 使用 Google Gemini-2.0-Flash 生成准确的单词定义
-- 🔊 **智能音频播放**: 
+- 🔊 **智能音频播放**:
   - **自动播放**: 单词载入后延迟1秒自动播放音频
   - **手动播放**: 支持 Shift+P 快捷键和播放按钮
   - **音频优先级**: Anki有道API > Anki媒体文件 > 本地TTS生成
@@ -238,6 +240,7 @@ PYTHONPATH=./backend
 - 🎯 **交互式学习**: 单词练习、发音播放和即时反馈
 
 ### 技术特性
+
 - 💰 **成本优化**: 无需付费 API，大幅降低使用成本
 - 🌐 **现代化架构**: Next.js + Flask + SQLAlchemy 技术栈
 - 📱 **响应式设计**: Tailwind CSS 实现的美观界面
@@ -288,13 +291,15 @@ PYTHONPATH=./backend
 
 2. **Node.js 依赖问题**
    - 清除缓存: `npm cache clean --force`
+
 - 删除 `node_modules` 重新安装: `rm -rf node_modules && npm install`
-   - 确保 Node.js 版本 >= 16
-   - 确保 npm 版本 >= 8.0.0
+  - 确保 Node.js 版本 >= 16
+  - 确保 npm 版本 >= 8.0.0
 
 ## 📚 技术栈
 
 ### 后端技术
+
 - **Flask 2.3.3**: Web 框架
 - **SQLAlchemy 2.0.23**: ORM 数据库操作
 - **LangChain 0.0.350**: AI 应用框架
@@ -303,6 +308,7 @@ PYTHONPATH=./backend
 - **requests 2.31.0**: HTTP 客户端
 
 ### 前端技术
+
 - **Next.js 14.0.4**: React 全栈框架
 - **React 18.2.0**: 用户界面库
 - **Tailwind CSS 4.1.11**: 原子化 CSS 框架
@@ -310,6 +316,7 @@ PYTHONPATH=./backend
 - **TypeScript**: 类型安全的 JavaScript
 
 ### 开发工具
+
 - **VSCode**: 集成开发环境
 - **Python venv**: 虚拟环境管理
 - **npm**: Node.js 官方包管理器
@@ -319,10 +326,12 @@ PYTHONPATH=./backend
 ### 后端 API 端点
 
 #### 单词管理
+
 - `GET /api/words` - 获取所有单词列表
 - `POST /api/sync-anki` - 同步 Anki 卡片数据
 
 #### 媒体生成
+
 - `POST /api/generate-media` - 为单词生成图片和音频
 
 ### 数据模型
@@ -357,6 +366,7 @@ class Word(db.Model):
 5. **创建 Pull Request** - 提交合并请求
 
 ### 开发规范
+
 - 遵循 PEP 8 Python 代码规范
 - 使用 TypeScript 进行前端开发
 - 编写清晰的提交信息
