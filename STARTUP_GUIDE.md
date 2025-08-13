@@ -23,8 +23,46 @@ npm run dev
 
 ## 启动后访问地址
 
+### 本地访问
+
 - **前端应用**: http://localhost:3000 (或显示的其他端口)
 - **后端API**: http://localhost:5001
+
+### 局域网访问
+
+如需在同一WiFi网络的其他设备上访问：
+
+#### 自动配置（推荐）
+
+```bash
+# 获取本机IP地址
+ifconfig | grep 'inet ' | grep -v '127.0.0.1' | awk '{print $2}' | head -1
+
+# 使用环境变量启动（替换为实际IP地址）
+BACKEND_HOST=192.168.2.63 ./start.sh
+```
+
+启动后的访问地址：
+- **前端应用**: http://192.168.2.63:3000
+- **后端API**: http://192.168.2.63:5001
+
+#### 手动配置
+
+1. **修改前端配置**（已配置）：
+   ```json
+   // frontend/package.json
+   "dev": "next dev -H 0.0.0.0"
+   ```
+
+2. **设置后端主机**：
+   ```bash
+   export BACKEND_HOST=你的IP地址
+   ./start.sh
+   ```
+
+3. **验证配置**：
+   - 前端显示：`Network: http://0.0.0.0:3000`
+   - 后端显示：`Running on http://192.168.x.x:5001`
 
 ## 首次使用准备
 
@@ -83,6 +121,42 @@ npm install
 ### 端口冲突
 
 如果端口被占用，前端会自动尝试其他端口（3001, 3002等）。
+
+如果后端端口5001被占用：
+```bash
+# 查找占用端口的进程
+lsof -ti:5001
+
+# 终止占用进程
+lsof -ti:5001 | xargs kill -9
+```
+
+### 局域网访问问题
+
+#### 问题：其他设备显示"加载单词中"卡住
+
+**原因**：前端无法连接到后端API
+
+**解决方案**：
+1. 确认使用了正确的IP地址启动：
+   ```bash
+   BACKEND_HOST=你的实际IP ./start.sh
+   ```
+
+2. 检查防火墙设置，确保允许3000和5001端口访问
+
+3. 验证所有设备连接到同一WiFi网络
+
+4. 重启服务并检查启动日志中的网络配置
+
+#### 问题：无法获取本机IP地址
+
+```bash
+# macOS/Linux 获取IP地址的其他方法
+hostname -I | awk '{print $1}'  # Linux
+ipconfig getifaddr en0          # macOS WiFi
+ipconfig getifaddr en1          # macOS 以太网
+```
 
 ### Python环境问题
 

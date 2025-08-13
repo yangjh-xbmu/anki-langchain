@@ -1,6 +1,7 @@
 import { EyeSlashIcon, PhotoIcon, SpeakerWaveIcon } from '@heroicons/react/24/outline';
 import axios from "axios";
 import React, { useEffect, useRef, useState } from "react";
+import CelebrationEffect from '../src/components/CelebrationEffect';
 
 interface Word {
   id: string;
@@ -40,9 +41,14 @@ export default function Home() {
     streak: 0
   });
   const [userInteracted, setUserInteracted] = useState(false);
+  const [showCelebration, setShowCelebration] = useState(false);
+  const [celebrationEnabled, setCelebrationEnabled] = useState(true); // 祝贺动画开关
+  const [soundEnabled, setSoundEnabled] = useState(true); // 音效开关
   
   // 输入框引用，用于自动聚焦
   const inputRef = useRef<HTMLInputElement>(null);
+  // 提交按钮引用，用于粒子效果定位
+  const submitButtonRef = useRef<HTMLButtonElement>(null);
 
   const fetchWords = async () => {
     try {
@@ -95,6 +101,10 @@ export default function Home() {
 
       if (isCorrect) {
         setFeedback("✅ 正确！");
+        // 触发祝贺动画（如果启用）
+        if (celebrationEnabled) {
+          setShowCelebration(true);
+        }
       } else {
         setFeedback(`❌ 错误。正确答案是: ${currentWord.word}`);
       }
@@ -264,98 +274,121 @@ export default function Home() {
           </div>
         )}
 
-        {/* 练习区域 */}
+        {/* 练习区域 - 左右分栏布局 */}
         {currentWord ? (
           <div className="bg-white rounded-3xl shadow-xl border border-gray-100 overflow-hidden">
             <div className="p-8">
-              {/* 单词图片 - 视觉中心 */}
-              {showImage && currentWord.image_url && (
-                <div className="text-center mb-8">
-                  <div className="relative inline-block">
-                    <div className="w-80 h-80 rounded-3xl overflow-hidden shadow-lg">
-                      <img
-                        src={currentWord.image_url}
-                        alt={currentWord.word}
-                        className="w-full h-full object-cover"
-                        onError={(e) => {
-                          e.currentTarget.style.display = 'none';
-                        }}
+              <div className="grid grid-cols-1 xl:grid-cols-2 gap-8 min-h-[600px]">
+                {/* 左侧：图片和词义显示区域 */}
+                <div className="flex flex-col justify-start items-center space-y-6 overflow-y-auto max-h-[600px] py-4">
+                  {/* 单词图片 */}
+                  {showImage && currentWord.image_url && (
+                    <div className="relative flex-shrink-0">
+                      <div className="w-80 h-80 rounded-3xl overflow-hidden shadow-lg">
+                        <img
+                          src={currentWord.image_url}
+                          alt={currentWord.word}
+                          className="w-full h-full object-cover"
+                          onError={(e) => {
+                            e.currentTarget.style.display = 'none';
+                          }}
+                        />
+                      </div>
+                      {/* 音频播放按钮 */}
+                      {currentWord.audio_url && (
+                        <button
+                          onClick={() => {
+                            if (!userInteracted) {
+                              setUserInteracted(true);
+                            }
+                            playAudio(currentWord.audio_url!);
+                          }}
+                          className="absolute -bottom-4 -right-4 w-12 h-12 bg-green-500 hover:bg-green-600 text-white rounded-full shadow-lg transition-all duration-200 flex items-center justify-center"
+                          title="播放发音"
+                        >
+                          <SpeakerWaveIcon className="h-6 w-6" />
+                        </button>
+                      )}
+                    </div>
+                  )}
+
+                  {/* 单词含义显示 */}
+                  <div className="text-center flex-shrink-0">
+                    <div className="bg-gray-50 px-8 py-4 rounded-2xl">
+                      <div className="text-3xl font-semibold text-gray-700">
+                        {currentWord.meaning}
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* 如果没有图片，显示音频播放按钮 */}
+                  {(!showImage || !currentWord.image_url) && currentWord.audio_url && (
+                    <button
+                      onClick={() => {
+                        if (!userInteracted) {
+                          setUserInteracted(true);
+                        }
+                        playAudio(currentWord.audio_url!);
+                      }}
+                      className="w-16 h-16 bg-green-500 hover:bg-green-600 text-white rounded-full shadow-lg transition-all duration-200 flex items-center justify-center flex-shrink-0"
+                      title="播放发音"
+                    >
+                      <SpeakerWaveIcon className="h-8 w-8" />
+                    </button>
+                  )}
+                </div>
+
+                {/* 右侧：输入和交互区域 - 固定在中央 */}
+                <div className="flex flex-col justify-center space-y-8 h-[600px]">
+                  {/* 输入区域 */}
+                  <div className="space-y-6">
+                    <div>
+                      <input
+                        ref={inputRef}
+                        type="text"
+                        value={userAnswer}
+                        onChange={(e) => setUserAnswer(e.target.value)}
+                        onKeyPress={handleKeyPress}
+                        placeholder="在这里输入英文单词..."
+                        className="w-full px-6 py-4 text-2xl text-center border-2 border-gray-200 rounded-2xl focus:border-blue-500 focus:outline-none transition-all duration-200"
+                        disabled={feedback !== "" || isLoading}
+                        autoFocus
+                        inputMode="text"
+                        autoComplete="off"
+                        autoCorrect="off"
+                        spellCheck="false"
                       />
                     </div>
-                    {/* 音频播放按钮 */}
-                    {currentWord.audio_url && (
+                    
+                    <div className="text-center">
                       <button
-                        onClick={() => {
-                          if (!userInteracted) {
-                            setUserInteracted(true);
-                          }
-                          playAudio(currentWord.audio_url!);
-                        }}
-                        className="absolute -bottom-4 -right-4 w-12 h-12 bg-green-500 hover:bg-green-600 text-white rounded-full shadow-lg transition-all duration-200 flex items-center justify-center"
-                        title="播放发音"
+                        ref={submitButtonRef}
+                        onClick={submitAnswer}
+                        disabled={!userAnswer.trim() || feedback !== "" || isLoading}
+                        className="bg-blue-500 hover:bg-blue-600 disabled:bg-gray-300 text-white px-12 py-4 rounded-2xl font-medium transition-all duration-200 flex items-center gap-3 mx-auto text-lg"
                       >
-                        <SpeakerWaveIcon className="h-6 w-6" />
+                        {isLoading ? (
+                          <div className="w-6 h-6 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                        ) : (
+                          <span>✨</span>
+                        )}
+                        <span>提交答案</span>
                       </button>
-                    )}
+                    </div>
                   </div>
-                </div>
-              )}
 
-              {/* 单词含义显示 - 更小 */}
-              <div className="text-center mb-8">
-                <div className="inline-block bg-gray-50 px-6 py-3 rounded-2xl">
-                  <div className="text-2xl font-semibold text-gray-700">
-                    {currentWord.meaning}
-                  </div>
+                  {/* 反馈信息 */}
+                  {feedback && (
+                    <div className={`p-6 rounded-2xl text-center font-medium text-lg ${
+                      feedback.includes('✅') 
+                        ? 'bg-green-50 text-green-700 border border-green-200' 
+                        : 'bg-red-50 text-red-700 border border-red-200'
+                    }`}>
+                      {feedback}
+                    </div>
+                  )}
                 </div>
               </div>
-
-              {/* 输入区域 - 更大 */}
-              <div className="space-y-6">
-                <div className="max-w-2xl mx-auto">
-                  <input
-                    ref={inputRef}
-                    type="text"
-                    value={userAnswer}
-                    onChange={(e) => setUserAnswer(e.target.value)}
-                    onKeyPress={handleKeyPress}
-                    placeholder="在这里输入英文单词..."
-                    className="w-full px-6 py-4 text-2xl text-center border-2 border-gray-200 rounded-2xl focus:border-blue-500 focus:outline-none transition-all duration-200"
-                    disabled={feedback !== "" || isLoading}
-                    autoFocus
-                    inputMode="text"
-                    autoComplete="off"
-                    autoCorrect="off"
-                    spellCheck="false"
-                  />
-                </div>
-                
-                <div className="text-center">
-                  <button
-                    onClick={submitAnswer}
-                    disabled={!userAnswer.trim() || feedback !== "" || isLoading}
-                    className="bg-blue-500 hover:bg-blue-600 disabled:bg-gray-300 text-white px-8 py-3 rounded-2xl font-medium transition-all duration-200 flex items-center gap-2 mx-auto"
-                  >
-                    {isLoading ? (
-                      <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                    ) : (
-                      <span>✨</span>
-                    )}
-                    <span>提交答案</span>
-                  </button>
-                </div>
-              </div>
-
-              {/* 反馈信息 */}
-              {feedback && (
-                <div className={`mt-6 p-4 rounded-2xl text-center font-medium ${
-                  feedback.includes('✅') 
-                    ? 'bg-green-50 text-green-700 border border-green-200' 
-                    : 'bg-red-50 text-red-700 border border-red-200'
-                }`}>
-                  {feedback}
-                </div>
-              )}
 
               {/* 调试信息 */}
               <details className="mt-6 bg-gray-50 rounded-2xl border border-gray-200">
@@ -418,7 +451,7 @@ export default function Home() {
         {/* 次要功能区域 - 移到页面底部 */}
         <div className="mt-8 space-y-6">
           {/* 控制按钮 */}
-          <div className="flex justify-center gap-3">
+          <div className="flex justify-center gap-3 flex-wrap">
             <button
               onClick={syncAnkiWords}
               className="bg-white hover:bg-gray-50 text-gray-700 px-4 py-2 rounded-xl shadow-sm border border-gray-200 transition-all duration-200 flex items-center gap-2"
@@ -439,6 +472,37 @@ export default function Home() {
               )}
               <span className="text-sm font-medium">{showImage ? '隐藏图片' : '显示图片'}</span>
             </button>
+            <button
+              onClick={() => setCelebrationEnabled(!celebrationEnabled)}
+              className={`px-4 py-2 rounded-xl shadow-sm border transition-all duration-200 flex items-center gap-2 ${
+                celebrationEnabled 
+                  ? 'bg-blue-50 hover:bg-blue-100 text-blue-700 border-blue-200' 
+                  : 'bg-white hover:bg-gray-50 text-gray-700 border-gray-200'
+              }`}
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 3l14 9-14 9V3z" />
+              </svg>
+              <span className="text-sm font-medium">{celebrationEnabled ? '关闭动画' : '开启动画'}</span>
+            </button>
+            <button
+              onClick={() => setSoundEnabled(!soundEnabled)}
+              className={`px-4 py-2 rounded-xl shadow-sm border transition-all duration-200 flex items-center gap-2 ${
+                soundEnabled 
+                  ? 'bg-green-50 hover:bg-green-100 text-green-700 border-green-200' 
+                  : 'bg-white hover:bg-gray-50 text-gray-700 border-gray-200'
+              }`}
+            >
+              {soundEnabled ? (
+                <SpeakerWaveIcon className="h-4 w-4" />
+              ) : (
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z" clipRule="evenodd" />
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2" />
+                </svg>
+              )}
+              <span className="text-sm font-medium">{soundEnabled ? '关闭音效' : '开启音效'}</span>
+            </button>
           </div>
 
           {/* 词库统计信息 */}
@@ -451,6 +515,17 @@ export default function Home() {
           )}
         </div>
       </div>
+      
+      {/* 祝贺动画效果 */}
+      {showCelebration && (
+        <CelebrationEffect
+          isVisible={showCelebration}
+          onComplete={() => setShowCelebration(false)}
+          playSound={soundEnabled}
+          reducedMotion={!celebrationEnabled}
+          buttonRef={submitButtonRef}
+        />
+      )}
     </div>
   );
 }
