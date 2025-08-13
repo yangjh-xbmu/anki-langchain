@@ -1,0 +1,23 @@
+{
+    "recommendations": [
+        "ms-python.python",
+        "ms-python.flake8",
+        "ms-python.black-formatter",
+        "ms-python.isort",
+        "ms-vscode.vscode-json",
+        "bradlc.vscode-tailwindcss",
+        "esbenp.prettier-vscode",
+        "dbaeumer.vscode-eslint",
+        "ms-vscode.vscode-typescript-next",
+        "formulahendry.auto-rename-tag",
+        "christian-kohler.path-intellisense",
+        "ms-vscode.vscode-css-peek",
+        "ritwickdey.liveserver",
+        "mikestead.dotenv",
+        "ms-vscode.vscode-thunder-client",
+        "humao.rest-client"
+    ],
+    "unwantedRecommendations": [
+        "ms-python.pylint"
+    ]
+}
