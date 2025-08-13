@@ -2,6 +2,7 @@ import { EyeSlashIcon, PhotoIcon, SpeakerWaveIcon } from '@heroicons/react/24/ou
 import axios from "axios";
 import React, { useEffect, useRef, useState } from "react";
 import CelebrationEffect from '../src/components/CelebrationEffect';
+import Link from 'next/link';
 
 interface Word {
   id: string;
@@ -264,6 +265,46 @@ export default function Home() {
           </div>
         )}
 
+        {/* 快速导航 */}
+        <div className="bg-gradient-to-r from-blue-50 to-purple-50 rounded-2xl p-6 border border-blue-100 mb-8">
+          <h2 className="text-xl font-bold text-gray-800 mb-4 flex items-center gap-2">
+            🚀 快速导航
+          </h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <Link href="/learning-center">
+              <div className="bg-white hover:bg-gray-50 rounded-xl p-4 border border-gray-200 transition-all duration-200 cursor-pointer group">
+                <div className="flex items-center gap-3">
+                  <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center group-hover:bg-blue-200 transition-colors">
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                    </svg>
+                  </div>
+                  <div>
+                    <h3 className="font-semibold text-gray-800 group-hover:text-blue-600 transition-colors">学习中心</h3>
+                    <p className="text-sm text-gray-600">查看学习进度和智能推荐</p>
+                  </div>
+                </div>
+              </div>
+            </Link>
+            <Link href="/settings">
+              <div className="bg-white hover:bg-gray-50 rounded-xl p-4 border border-gray-200 transition-all duration-200 cursor-pointer group">
+                <div className="flex items-center gap-3">
+                  <div className="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center group-hover:bg-purple-200 transition-colors">
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-purple-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                    </svg>
+                  </div>
+                  <div>
+                    <h3 className="font-semibold text-gray-800 group-hover:text-purple-600 transition-colors">个人设置</h3>
+                    <p className="text-sm text-gray-600">个性化配置和偏好设置</p>
+                  </div>
+                </div>
+              </div>
+            </Link>
+          </div>
+        </div>
+
         {/* 状态信息 */}
         {syncStatus && (
           <div className="alert alert-info mb-6">
@@ -448,72 +489,19 @@ export default function Home() {
           </div>
         </div>
 
-        {/* 次要功能区域 - 移到页面底部 */}
-        <div className="mt-8 space-y-6">
-          {/* 控制按钮 */}
-          <div className="flex justify-center gap-3 flex-wrap">
-            <button
-              onClick={syncAnkiWords}
-              className="bg-white hover:bg-gray-50 text-gray-700 px-4 py-2 rounded-xl shadow-sm border border-gray-200 transition-all duration-200 flex items-center gap-2"
-            >
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
-              </svg>
-              <span className="text-sm font-medium">同步 Anki 单词</span>
-            </button>
-            <button
-              onClick={() => setShowImage(!showImage)}
-              className="bg-white hover:bg-gray-50 text-gray-700 px-4 py-2 rounded-xl shadow-sm border border-gray-200 transition-all duration-200 flex items-center gap-2"
-            >
-              {showImage ? (
-                <EyeSlashIcon className="h-4 w-4" />
-              ) : (
-                <PhotoIcon className="h-4 w-4" />
-              )}
-              <span className="text-sm font-medium">{showImage ? '隐藏图片' : '显示图片'}</span>
-            </button>
-            <button
-              onClick={() => setCelebrationEnabled(!celebrationEnabled)}
-              className={`px-4 py-2 rounded-xl shadow-sm border transition-all duration-200 flex items-center gap-2 ${
-                celebrationEnabled 
-                  ? 'bg-blue-50 hover:bg-blue-100 text-blue-700 border-blue-200' 
-                  : 'bg-white hover:bg-gray-50 text-gray-700 border-gray-200'
-              }`}
-            >
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 3l14 9-14 9V3z" />
-              </svg>
-              <span className="text-sm font-medium">{celebrationEnabled ? '关闭动画' : '开启动画'}</span>
-            </button>
-            <button
-              onClick={() => setSoundEnabled(!soundEnabled)}
-              className={`px-4 py-2 rounded-xl shadow-sm border transition-all duration-200 flex items-center gap-2 ${
-                soundEnabled 
-                  ? 'bg-green-50 hover:bg-green-100 text-green-700 border-green-200' 
-                  : 'bg-white hover:bg-gray-50 text-gray-700 border-gray-200'
-              }`}
-            >
-              {soundEnabled ? (
-                <SpeakerWaveIcon className="h-4 w-4" />
-              ) : (
+        {/* 词库统计信息 */}
+        {wordCount > 0 && (
+          <div className="mt-8 text-center">
+            <div className="inline-block bg-white rounded-xl shadow-sm border border-gray-100 px-6 py-3">
+              <div className="flex items-center gap-2 text-gray-600">
                 <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z" clipRule="evenodd" />
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2" />
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.746 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
                 </svg>
-              )}
-              <span className="text-sm font-medium">{soundEnabled ? '关闭音效' : '开启音效'}</span>
-            </button>
-          </div>
-
-          {/* 词库统计信息 */}
-          {wordCount > 0 && (
-            <div className="text-center">
-              <div className="inline-block bg-gray-50 text-gray-600 px-4 py-2 rounded-xl text-sm">
-                词库共有 {wordCount} 个单词
+                <span className="text-sm font-medium">词库共有 {wordCount} 个单词</span>
               </div>
             </div>
-          )}
-        </div>
+          </div>
+        )}
       </div>
       
       {/* 祝贺动画效果 */}

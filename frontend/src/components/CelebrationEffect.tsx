@@ -1,5 +1,5 @@
-import React, { useEffect, useState, useRef } from 'react';
-import { playSuccessSound } from '../utils/audioUtils';
+import React,{useEffect,useRef,useState} from 'react';
+import {playSuccessSound} from '../utils/audioUtils';
 
 interface Particle {
   id: number;
